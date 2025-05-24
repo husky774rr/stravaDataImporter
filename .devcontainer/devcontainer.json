@@ -11,14 +11,58 @@
     "customizations": {
         "vscode": {
             "settings": {
-                "go.useLanguageServer": true
+                "go.useLanguageServer": true,
+                "go.toolsManagement.checkForUpdates": "local",
+                "go.testFlags": [
+                    "-v"
+                ],
+                "go.coverOnSave": true,
+                "go.coverOnSingleTest": true,
+                "go.formatTool": "goimports",
+                "go.lintTool": "golangci-lint",
+                "go.vetOnSave": "package",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": true
+                }
             },
             "extensions": [
                 "golang.Go",
-                "github.vscode-github-actions"
+                "github.vscode-github-actions",
+                "github.copilot",
+                "github.copilot-chat",
+                "ms-vscode.vscode-json",
+                "redhat.vscode-yaml",
+                "ms-azuretools.vscode-docker",
+                "bradlc.vscode-tailwindcss",
+                "ms-vscode.test-adapter-converter",
+                "hbenl.vscode-test-explorer",
+                "formulahendry.code-runner",
+                "ms-vscode.makefile-tools",
+                "influxdata.flux",
+                "mechatroner.rainbow-csv"
             ]
         }
     },
-    "postCreateCommand": "go mod tidy",
-    "remoteUser": "vscode"
+    "postCreateCommand": "go mod tidy && go install -a std",
+    "remoteUser": "vscode",
+    "forwardPorts": [
+        8080,
+        8086,
+        3000
+    ],
+    "portsAttributes": {
+        "8080": {
+            "label": "Strava Data Importer",
+            "onAutoForward": "notify"
+        },
+        "8086": {
+            "label": "InfluxDB",
+            "onAutoForward": "silent"
+        },
+        "3000": {
+            "label": "Grafana",
+            "onAutoForward": "silent"
+        }
+    }
 }

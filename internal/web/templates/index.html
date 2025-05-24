@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava Data Importer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            color: #fc4c02;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+        .features {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: #fc4c02;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .get-started-btn {
+            background: #fc4c02;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(252, 76, 2, 0.3);
+        }
+        .get-started-btn:hover {
+            background: #e43a00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 76, 2, 0.4);
+        }
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">STRAVA</div>
+        <h1>データインポーター</h1>
+        <p class="description">
+            Stravaのアクティビティデータを自動的に取得・分析し、<br>
+            TSS、NP、週次・月次・年次レポートを生成します。
+        </p>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <div>自動データ同期（1時間毎）</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div>TSS・NP・IF 自動計算</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📈</div>
+                <div>週次・月次・年次集計</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🐦</div>
+                <div>SNS自動投稿機能</div>
+            </div>
+        </div>
+        
+        <a href="/login" class="get-started-btn">
+            始める
+        </a>
+        
+        <div class="footer">
+            StravaのOAuth認証を使用して安全にデータを取得します
+        </div>
+    </div>
+</body>
+</html>

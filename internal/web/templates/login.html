@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #fc4c02;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+        .login-btn {
+            background: #fc4c02;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(252, 76, 2, 0.3);
+        }
+        .login-btn:hover {
+            background: #e43a00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 76, 2, 0.4);
+        }
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #a66;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">STRAVA</div>
+        <h1>データインポーター</h1>
+        <p class="description">
+            Stravaのアクティビティデータを取得し、<br>
+            分析・可視化するためのツールです。
+        </p>
+        
+        {{if .error}}
+        <div class="error">
+            認証に失敗しました。もう一度お試しください。
+        </div>
+        {{end}}
+        
+        <a href="/auth/login" class="login-btn">
+            Stravaでログイン
+        </a>
+    </div>
+</body>
+</html>

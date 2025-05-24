@@ -1,0 +1,124 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "go: build",
+            "type": "shell",
+            "command": "go",
+            "args": ["build", "-o", "bin/main", "./cmd/main.go"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "go: test",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "-v", "./..."],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "go: test with coverage",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "-v", "-race", "-coverprofile=coverage.out", "./..."],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "go: run",
+            "type": "shell",
+            "command": "go",
+            "args": ["run", "./cmd/main.go"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$go",
+            "isBackground": true
+        },
+        {
+            "label": "docker: compose up",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "up", "-d"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "docker: compose down",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "down"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "make: test",
+            "type": "shell",
+            "command": "make",
+            "args": ["test"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "make: build",
+            "type": "shell",
+            "command": "make",
+            "args": ["build"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$go"
+        }
+    ]
+}
