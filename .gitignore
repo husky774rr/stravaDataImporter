@@ -1,6 +1,7 @@
+# Go language specific
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -21,49 +22,184 @@
 go.work
 go.work.sum
 
-# env file
-.env
-
 # Build artifacts
 bin/
 dist/
 build/
+*.binary
+
+# Environment files
+.env
+.env.local
+.env.*.local
+local.env
+*.local
+
+# Configuration files with secrets
+config.json
+secrets.yaml
+secrets.yml
 
 # Coverage reports
 coverage.out
 coverage.html
+coverage.xml
+coverage.txt
+*.cover
+*.coverprofile
 
-# IDE files
+# Test results
+test-results/
+test-output/
+
+# Benchmark results
+*.bench
+
+# Profiling files
+*.prof
+*.pprof
+cpu.prof
+mem.prof
+trace.out
+
+# IDE and Editor files
+# VSCode
 .vscode/settings.json
+.vscode/*.code-workspace
+.vscode/launch.json.backup
+
+# IntelliJ IDEA
 .idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
 *.swp
 *.swo
 *~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
 
 # OS generated files
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
+Icon?
+
+# Windows
 ehthumbs.db
 Thumbs.db
+Desktop.ini
 
-# Logs
-*.log
+# Linux
+.directory
+.fuse_hidden*
+
+# Logs and runtime data
 logs/
+*.log
+log/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
 # Temporary files
 tmp/
 temp/
+.tmp/
+.temp/
 
-# Docker volumes
-docker-volumes/
-
-# Local development
-local.env
-*.local
+# Cache directories
+.cache/
+.parcel-cache/
 
 # Backup files
 *.bak
 *.backup
+*.orig
+*~
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker specific
+# Do not ignore docker-compose.yml and Dockerfile (they should be committed)
+docker-volumes/
+.docker/
+docker/volumes/
+
+# InfluxDB data (if running locally)
+influxdb-data/
+influxdb_data/
+
+# Grafana data (if running locally)
+grafana-data/
+grafana_data/
+
+# Application specific
+# Token storage
+tokens/
+.tokens/
+auth_tokens.json
+token.json
+strava_token.json
+
+# FTP data backup (keep the template)
+conf/ftp.csv.bak
+conf/*.backup
+
+# Activity data storage (if stored locally)
+activities/
+activity_data/
+
+# Session data
+sessions/
+.sessions/
+
+# Generated documentation
+docs/build/
+docs/_build/
+
+# Local development overrides
+docker-compose.override.yml
+docker-compose.local.yml
+
+# GitHub Copilot Agent History (optional - you may want to keep this)
+GitHubCopilotAgentHistory/
+
+# Strava API related
+strava_cache/
+.strava_cache/
+
+# InfluxDB query files
+*.flux
+*.influxql
+
+# Grafana dashboards (if generated locally)
+grafana-dashboards/*.json
+!grafana-dashboards/template-*.json
+
+# Twitter/X API cache
+twitter_cache/
+.twitter_cache/
