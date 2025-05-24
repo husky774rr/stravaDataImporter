@@ -31,7 +31,7 @@ func (f *FTPManager) LoadFTPData() error {
 	if err != nil {
 		return fmt.Errorf("failed to open FTP file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()

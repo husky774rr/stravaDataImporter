@@ -138,7 +138,7 @@ func (c *InfluxDBClient) GetLatestActivity() (*strava.ActivityData, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %w", err)
 	}
-	defer result.Close()
+	defer func() { _ = result.Close() }()
 
 	if !result.Next() {
 		return nil, nil // No activities found
@@ -172,7 +172,7 @@ func (c *InfluxDBClient) GetWeeklyTrend() ([]strava.WeeklySummary, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %w", err)
 	}
-	defer result.Close()
+	defer func() { _ = result.Close() }()
 
 	var summaries []strava.WeeklySummary
 	for result.Next() {

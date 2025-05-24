@@ -8,16 +8,16 @@ import (
 
 func TestLoad(t *testing.T) {
 	// Set test environment variables
-	os.Setenv("PORT", "9999")
-	os.Setenv("STRAVA_CLIENT_ID", "test_client_id")
-	os.Setenv("TOKEN_REFRESH_HOURS", "48")
-	os.Setenv("DATA_IMPORT_HOURS", "2")
+	_ = os.Setenv("PORT", "9999")
+	_ = os.Setenv("STRAVA_CLIENT_ID", "test_client_id")
+	_ = os.Setenv("TOKEN_REFRESH_HOURS", "48")
+	_ = os.Setenv("DATA_IMPORT_HOURS", "2")
 
 	defer func() {
-		os.Unsetenv("PORT")
-		os.Unsetenv("STRAVA_CLIENT_ID")
-		os.Unsetenv("TOKEN_REFRESH_HOURS")
-		os.Unsetenv("DATA_IMPORT_HOURS")
+		_ = os.Unsetenv("PORT")
+		_ = os.Unsetenv("STRAVA_CLIENT_ID")
+		_ = os.Unsetenv("TOKEN_REFRESH_HOURS")
+		_ = os.Unsetenv("DATA_IMPORT_HOURS")
 	}()
 
 	cfg, err := Load()

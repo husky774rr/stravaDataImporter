@@ -61,7 +61,7 @@ func (c *Client) ExchangeCodeForToken(code string) (*TokenData, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to exchange code for token: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -92,7 +92,7 @@ func (c *Client) RefreshToken(refreshToken string) (*TokenData, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh token: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -129,7 +129,7 @@ func (c *Client) GetActivities(accessToken string, after time.Time, perPage int)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch activities: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -158,7 +158,7 @@ func (c *Client) GetActivity(accessToken string, activityID int64) (*StravaActiv
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch activity: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -185,7 +185,7 @@ func (c *Client) GetAthlete(accessToken string) (*AthleteInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch athlete: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)

@@ -407,6 +407,61 @@ stravaDataImporter/
 
 すべての要件が実装され、完全に動作する本格的なWebアプリケーションとして完成しています！🎉
 
+README.mdとMakefileの内容を比較して、不足しているmakeターゲットを確認します。まず、README.mdに記載されているmakeコマンドを調べてみましょう。 現在のMakefileを確認して、README.mdに記載されているmakeターゲットと比較します。 Makefileの残りの部分も確認します。 現在のMakefileと比較して、README.mdに記載されているが不足しているmakeターゲットを特定し、実装します。
+
+不足しているターゲット：
+1. `setup-env`
+2. `init-project`
+3. `docker-up`
+4. `docker-down`
+5. `run`
+6. `test-coverage`
+7. `test-integration`
+8. `benchmark`
+9. `lint`
+10. `format`
+11. `security`
+12. `build-all`
+13. `docker-build`
+14. `docker-logs`
+
+これらのターゲットをMakefileに追加します。 
+```
+
+
+変更を行いました。
+
+
+```
+
+```
+
+
+変更を行いました。
+
+
+```
+
+```
+
+
+変更を行いました。
+
+
+```
+.env.exampleファイルも作成する必要があります。 .env.exampleファイルが既に存在するかチェックします。 .env.exampleファイルが既に存在するので、内容を確認して必要に応じて更新します。 .env.exampleファイルは既に適切に設定されているようです。次に、更新されたMakefileをテストして、正しく動作することを確認します。 素晴らしい！すべてのターゲットが正しく表示されています。いくつかのターゲットをテストして、正しく動作することを確認しましょう。 gosecのインストールコマンドに問題があるようです。正しいパッケージ名に修正しましょう。 gosecの正しいパッケージ名を確認しましょう。 
+```
+
+
+変更を行いました。
+
+
+```
+
+
+反復処理を続行しますか?
+Copilot はしばらくの間、この問題に取り組んでいます。反復処理を続行するか、新しいメッセージを送信してプロンプトを絞り込むことができます。
+
 ## スクショ
 
 - ![alt text](image.png)
@@ -427,3 +482,12 @@ stravaDataImporter/
 - ![alt text](image-15.png)
 - ![alt text](image-16.png)
 - ![alt text](image-17.png)
+- ![alt text](image-18.png)
+- ![alt text](image-19.png)
+- ![alt text](image-20.png)
+- ![alt text](image-21.png)
+- ![alt text](image-22.png)
+- ![alt text](image-23.png)
+- ![alt text](image-24.png)
+- ![alt text](image-25.png)
+- ![alt text](image-26.png)

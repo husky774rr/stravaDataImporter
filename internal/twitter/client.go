@@ -145,6 +145,7 @@ func (c *Client) translateActivityType(activityType string) string {
 	return activityType // Return original if no translation found
 }
 
+//nolint:unused // This function is planned for future implementation
 func (c *Client) generateWeeklyTrendImage(summaries []strava.WeeklySummary) ([]byte, error) {
 	// TODO: Implement chart generation
 	// This would use a charting library like go-echarts to generate
