@@ -47,7 +47,11 @@ func main() {
 	defer scheduler.Stop()
 
 	// Initialize web server
-	server := web.NewServer(cfg, influxClient)
+	server, err := web.NewServer(cfg, influxClient)
+	if err != nil {
+		log.Error("Failed to create web server", "error", err)
+		return
+	}
 
 	// Start web server in goroutine
 	go func() {

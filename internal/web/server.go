@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -22,7 +23,7 @@ type Server struct {
 	handler    *handlers.Handler
 }
 
-func NewServer(cfg *config.Config, influxClient *db.InfluxDBClient) *Server {
+func NewServer(cfg *config.Config, influxClient *db.InfluxDBClient) (*Server, error) {
 	// Set Gin mode
 	if cfg.Port == "8080" {
 		gin.SetMode(gin.DebugMode)
@@ -39,19 +40,43 @@ func NewServer(cfg *config.Config, influxClient *db.InfluxDBClient) *Server {
 	router.Use(requestTimeMiddleware())
 
 	// Load HTML templates
-	templatePath := "internal/web/templates/*"
-	// Try to load templates, handle case where path doesn't exist (for tests)
+	// Get current working directory and construct absolute path
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get working directory: %w", err)
+	}
+
+	// Check if we're running from cmd directory and adjust path accordingly
+	templatePath := filepath.Join(wd, "internal", "web", "templates", "*")
+	if filepath.Base(wd) == "cmd" {
+		// Running from cmd directory, go up one level
+		templatePath = filepath.Join(filepath.Dir(wd), "internal", "web", "templates", "*")
+	}
+	slog.Info("Attempting to load templates", "path", templatePath)
+
+	// Check if templates exist
 	if templates, err := filepath.Glob(templatePath); err != nil || len(templates) == 0 {
 		slog.Warn("Templates not found at primary path, trying alternative paths", "path", templatePath)
-		// Try alternative paths for tests
-		altPaths := []string{"templates/*", "web/templates/*", "../web/templates/*"}
+		// Try alternative paths for tests and different working directories
+		altPaths := []string{
+			"./internal/web/templates/*",
+			"../internal/web/templates/*", // From cmd directory
+			"internal/web/templates/*",
+			"templates/*",
+			"web/templates/*",
+			"../web/templates/*",
+		}
 		for _, altPath := range altPaths {
 			if templates, err := filepath.Glob(altPath); err == nil && len(templates) > 0 {
 				templatePath = altPath
+				slog.Info("Found templates at alternative path", "path", altPath, "files", templates)
 				break
 			}
 		}
+	} else {
+		slog.Info("Found templates at primary path", "path", templatePath, "files", templates)
 	}
+
 	router.LoadHTMLGlob(templatePath)
 
 	// Serve static files (if any)
@@ -76,7 +101,7 @@ func NewServer(cfg *config.Config, influxClient *db.InfluxDBClient) *Server {
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
-	return server
+	return server, nil
 }
 
 func (s *Server) setupRoutes() {

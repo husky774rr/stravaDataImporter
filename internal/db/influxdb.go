@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strconv"
 	"time"
 
 	"stravaDataImporter/internal/config"
@@ -132,6 +133,7 @@ func (c *InfluxDBClient) GetLatestActivity() (*strava.ActivityData, error) {
 		|> filter(fn: (r) => r._measurement == "activities")
 		|> sort(columns: ["_time"], desc: true)
 		|> limit(n: 1)
+		|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
 	`, c.bucket)
 
 	result, err := c.queryAPI.Query(context.Background(), query)
@@ -147,13 +149,89 @@ func (c *InfluxDBClient) GetLatestActivity() (*strava.ActivityData, error) {
 	record := result.Record()
 	activity := &strava.ActivityData{}
 
-	// Parse the record and populate activity
-	// This is a simplified version - in real implementation,
-	// you'd need to handle all fields properly
+	// Parse activity ID from tag
 	if val := record.ValueByKey("activity_id"); val != nil {
-		if id, ok := val.(string); ok {
-			// Parse ID from string
-			_ = id
+		if idStr, ok := val.(string); ok {
+			if id, err := strconv.ParseInt(idStr, 10, 64); err == nil {
+				activity.ID = id
+			}
+		}
+	}
+
+	// Parse activity name from tag
+	if val := record.ValueByKey("activity_name"); val != nil {
+		if name, ok := val.(string); ok {
+			activity.Name = name
+		}
+	}
+
+	// Parse activity type from tag
+	if val := record.ValueByKey("activity_type"); val != nil {
+		if actType, ok := val.(string); ok {
+			activity.Type = actType
+		}
+	}
+
+	// Parse numeric fields
+	activity.StartDate = record.Time()
+
+	if val := record.ValueByKey("distance"); val != nil {
+		if distance, ok := val.(float64); ok {
+			activity.Distance = distance
+		}
+	}
+
+	if val := record.ValueByKey("moving_time"); val != nil {
+		if movingTime, ok := val.(float64); ok {
+			activity.MovingTime = int(movingTime)
+		}
+	}
+
+	if val := record.ValueByKey("elapsed_time"); val != nil {
+		if elapsedTime, ok := val.(float64); ok {
+			activity.ElapsedTime = int(elapsedTime)
+		}
+	}
+
+	if val := record.ValueByKey("total_elevation_gain"); val != nil {
+		if elevation, ok := val.(float64); ok {
+			activity.TotalElevationGain = elevation
+		}
+	}
+
+	if val := record.ValueByKey("calories"); val != nil {
+		if calories, ok := val.(float64); ok {
+			activity.Calories = calories
+		}
+	}
+
+	if val := record.ValueByKey("average_watts"); val != nil {
+		if watts, ok := val.(float64); ok {
+			activity.AverageWatts = watts
+		}
+	}
+
+	if val := record.ValueByKey("max_watts"); val != nil {
+		if watts, ok := val.(float64); ok {
+			activity.MaxWatts = watts
+		}
+	}
+
+	if val := record.ValueByKey("tss"); val != nil {
+		if tss, ok := val.(float64); ok {
+			activity.TSS = tss
+		}
+	}
+
+	if val := record.ValueByKey("np"); val != nil {
+		if np, ok := val.(float64); ok {
+			activity.NP = np
+		}
+	}
+
+	if val := record.ValueByKey("ftp"); val != nil {
+		if ftp, ok := val.(float64); ok {
+			activity.FTP = ftp
 		}
 	}
 

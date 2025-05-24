@@ -44,7 +44,7 @@ func (s *Scheduler) Start() {
 		slog.Warn("Failed to load FTP data", "error", err)
 	}
 
-	// Schedule token refresh (daily)
+	// Schedule token refresh (daily at 2 AM)
 	refreshCron := "0 0 2 * * *" // 2 AM daily
 	_, err := s.cron.AddFunc(refreshCron, s.refreshTokenJob)
 	if err != nil {

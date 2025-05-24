@@ -100,3 +100,41 @@ type TokenResponse struct {
 	TokenType    string      `json:"token_type"`
 	Athlete      AthleteInfo `json:"athlete"`
 }
+
+// Helper methods for template display
+func (a *ActivityData) MovingTimeHours() float64 {
+	return float64(a.MovingTime) / 3600
+}
+
+func (a *ActivityData) DistanceKm() float64 {
+	return a.Distance / 1000
+}
+
+func (a *ActivityData) Date() string {
+	return a.StartDate.Format("2006年01月02日")
+}
+
+// Helper methods for summaries
+func (w *WeeklySummary) TotalMovingTimeHours() float64 {
+	return float64(w.TotalMovingTime) / 3600
+}
+
+func (w *WeeklySummary) TotalDistanceKm() float64 {
+	return w.TotalDistance / 1000
+}
+
+func (m *MonthlySummary) TotalMovingTimeHours() float64 {
+	return float64(m.TotalMovingTime) / 3600
+}
+
+func (m *MonthlySummary) TotalDistanceKm() float64 {
+	return m.TotalDistance / 1000
+}
+
+func (y *YearlySummary) TotalMovingTimeHours() float64 {
+	return float64(y.TotalMovingTime) / 3600
+}
+
+func (y *YearlySummary) TotalDistanceKm() float64 {
+	return y.TotalDistance / 1000
+}

@@ -5,7 +5,12 @@
             "label": "go: build",
             "type": "shell",
             "command": "go",
-            "args": ["build", "-o", "bin/main", "./cmd/main.go"],
+            "args": [
+                "build",
+                "-o",
+                "bin/main",
+                "./cmd/main.go"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -24,7 +29,11 @@
             "label": "go: test",
             "type": "shell",
             "command": "go",
-            "args": ["test", "-v", "./..."],
+            "args": [
+                "test",
+                "-v",
+                "./..."
+            ],
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -41,7 +50,13 @@
             "label": "go: test with coverage",
             "type": "shell",
             "command": "go",
-            "args": ["test", "-v", "-race", "-coverprofile=coverage.out", "./..."],
+            "args": [
+                "test",
+                "-v",
+                "-race",
+                "-coverprofile=coverage.out",
+                "./..."
+            ],
             "group": "test",
             "presentation": {
                 "echo": true,
@@ -55,7 +70,10 @@
             "label": "go: run",
             "type": "shell",
             "command": "go",
-            "args": ["run", "./cmd/main.go"],
+            "args": [
+                "run",
+                "./cmd/main.go"
+            ],
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -69,8 +87,14 @@
         {
             "label": "docker: compose up",
             "type": "shell",
-            "command": "docker-compose",
-            "args": ["-f", "docker/docker-compose.yml", "up", "-d"],
+            "command": "docker",
+            "args": [
+                "compose",
+                "-f",
+                "docker/docker-compose.yml",
+                "up",
+                "-d"
+            ],
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -82,8 +106,13 @@
         {
             "label": "docker: compose down",
             "type": "shell",
-            "command": "docker-compose",
-            "args": ["-f", "docker/docker-compose.yml", "down"],
+            "command": "docker",
+            "args": [
+                "compose",
+                "-f",
+                "docker/docker-compose.yml",
+                "down"
+            ],
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -96,7 +125,9 @@
             "label": "make: test",
             "type": "shell",
             "command": "make",
-            "args": ["test"],
+            "args": [
+                "test"
+            ],
             "group": "test",
             "presentation": {
                 "echo": true,
@@ -110,7 +141,9 @@
             "label": "make: build",
             "type": "shell",
             "command": "make",
-            "args": ["build"],
+            "args": [
+                "build"
+            ],
             "group": "build",
             "presentation": {
                 "echo": true,

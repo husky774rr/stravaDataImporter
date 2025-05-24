@@ -145,6 +145,10 @@ func (c *Client) translateActivityType(activityType string) string {
 	return activityType // Return original if no translation found
 }
 
+// generateWeeklyTrendImage generates a trend image visualizing weekly training data such as TSS, distance, and time
+// from the provided slice of strava.WeeklySummary. The image is intended for sharing on social media platforms.
+// Returns the generated image as a byte slice, or an error if image generation fails or is not implemented.
+//
 //nolint:unused // This function is planned for future implementation
 func (c *Client) generateWeeklyTrendImage(summaries []strava.WeeklySummary) ([]byte, error) {
 	// TODO: Implement chart generation

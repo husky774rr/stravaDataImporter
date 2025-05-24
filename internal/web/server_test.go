@@ -13,7 +13,10 @@ func TestNewServer(t *testing.T) {
 		Port: "8080",
 	}
 
-	server := NewServer(cfg, nil)
+	server, err := NewServer(cfg, nil)
+	if err != nil {
+		t.Fatalf("NewServer() returned error: %v", err)
+	}
 	if server == nil {
 		t.Fatal("NewServer() returned nil")
 	}
@@ -36,7 +39,10 @@ func TestHealthRoute(t *testing.T) {
 		Port: "8080",
 	}
 
-	server := NewServer(cfg, nil)
+	server, err := NewServer(cfg, nil)
+	if err != nil {
+		t.Fatalf("NewServer() returned error: %v", err)
+	}
 
 	req, err := http.NewRequest("GET", "/health", nil)
 	if err != nil {
@@ -61,7 +67,10 @@ func TestCORSMiddleware(t *testing.T) {
 		Port: "8080",
 	}
 
-	server := NewServer(cfg, nil)
+	server, err := NewServer(cfg, nil)
+	if err != nil {
+		t.Fatalf("NewServer() returned error: %v", err)
+	}
 
 	req, err := http.NewRequest("OPTIONS", "/health", nil)
 	if err != nil {
@@ -86,7 +95,10 @@ func TestHomeRedirect(t *testing.T) {
 		Port: "8080",
 	}
 
-	server := NewServer(cfg, nil)
+	server, err := NewServer(cfg, nil)
+	if err != nil {
+		t.Fatalf("NewServer() returned error: %v", err)
+	}
 
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -111,7 +123,10 @@ func TestProtectedRouteWithoutAuth(t *testing.T) {
 		Port: "8080",
 	}
 
-	server := NewServer(cfg, nil)
+	server, err := NewServer(cfg, nil)
+	if err != nil {
+		t.Fatalf("NewServer() returned error: %v", err)
+	}
 
 	req, err := http.NewRequest("GET", "/portal", nil)
 	if err != nil {

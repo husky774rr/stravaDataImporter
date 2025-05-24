@@ -20,7 +20,7 @@ BUILD_FLAGS=-ldflags="-s -w"
 
 # Docker parameters
 DOCKER_COMPOSE_FILE=docker/docker-compose.yml
-DOCKER_COMPOSE=docker-compose -f $(DOCKER_COMPOSE_FILE)
+DOCKER_COMPOSE=docker compose -f $(DOCKER_COMPOSE_FILE) --env-file .env
 
 # Colors for output
 GREEN=\033[0;32m
@@ -88,10 +88,20 @@ install-tools: ## Install development tools
 
 docker-up: ## Start Docker services
 	@echo "$(GREEN)Starting Docker services...$(NC)"
+	@if [ ! -f $(DOCKER_COMPOSE_FILE) ]; then \
+		echo "$(RED)Error: Docker Compose file not found at $(DOCKER_COMPOSE_FILE)$(NC)"; \
+		exit 1; \
+	fi
+	@command -v docker >/dev/null 2>&1 || { echo "$(RED)Error: Docker is not installed or not available$(NC)"; exit 1; }
 	$(DOCKER_COMPOSE) up -d
 
 docker-down: ## Stop Docker services
 	@echo "$(GREEN)Stopping Docker services...$(NC)"
+	@if [ ! -f $(DOCKER_COMPOSE_FILE) ]; then \
+		echo "$(RED)Error: Docker Compose file not found at $(DOCKER_COMPOSE_FILE)$(NC)"; \
+		exit 1; \
+	fi
+	@command -v docker >/dev/null 2>&1 || { echo "$(RED)Error: Docker is not installed or not available$(NC)"; exit 1; }
 	$(DOCKER_COMPOSE) down
 
 docker-build: ## Build Docker image
