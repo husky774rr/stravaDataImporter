@@ -65,7 +65,7 @@ run: build ## Run the built application
 setup-env: ## Setup environment files
 	@echo "$(GREEN)Setting up environment...$(NC)"
 	@if [ ! -f .env ]; then \
-		cp .env.example .env 2>/dev/null || echo "# Environment variables\nPORT=8080\nLOG_LEVEL=info\nSTRAVA_CLIENT_ID=\nSTRAVA_CLIENT_SECRET=\nSTRAVA_REDIRECT_URI=http://localhost:8080/auth/callback\nINFLUXDB_URL=http://localhost:8086\nINFLUXDB_TOKEN=\nINFLUXDB_ORG=strava\nINFLUXDB_BUCKET=activities\nTOKEN_REFRESH_INTERVAL=24h\nDATA_IMPORT_INTERVAL=1h" > .env; \
+		cp .env.example .env 2>/dev/null || echo "# Environment variables\nPORT=9090\nLOG_LEVEL=info\nSTRAVA_CLIENT_ID=\nSTRAVA_CLIENT_SECRET=\nSTRAVA_REDIRECT_URI=http://localhost:9090/auth/callback\nINFLUXDB_URL=http://localhost:8086\nINFLUXDB_TOKEN=\nINFLUXDB_ORG=strava\nINFLUXDB_BUCKET=activities\nTOKEN_REFRESH_INTERVAL=24h\nDATA_IMPORT_INTERVAL=1h" > .env; \
 		echo "$(GREEN).env file created. Please edit it with your settings.$(NC)"; \
 	else \
 		echo "$(YELLOW).env file already exists.$(NC)"; \

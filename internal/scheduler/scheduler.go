@@ -44,39 +44,44 @@ func (s *Scheduler) Start() {
 		slog.Warn("Failed to load FTP data", "error", err)
 	}
 
-	// Schedule token refresh (daily at 2 AM)
-	refreshCron := "0 0 2 * * *" // 2 AM daily
-	_, err := s.cron.AddFunc(refreshCron, s.refreshTokenJob)
+	// Schedule token refresh using config
+	_, err := s.cron.AddFunc(s.config.TokenRefreshCron, s.refreshTokenJob)
 	if err != nil {
-		slog.Error("Failed to schedule token refresh job", "error", err)
+		slog.Error("Failed to schedule token refresh job", "error", err, "cron", s.config.TokenRefreshCron)
+	} else {
+		slog.Info("Scheduled token refresh job", "cron", s.config.TokenRefreshCron)
 	}
 
-	// Schedule data import (hourly)
-	importCron := "0 0 * * * *" // Every hour
-	_, err = s.cron.AddFunc(importCron, s.importDataJob)
+	// Schedule data import using config
+	_, err = s.cron.AddFunc(s.config.DataImportCron, s.importDataJob)
 	if err != nil {
-		slog.Error("Failed to schedule data import job", "error", err)
+		slog.Error("Failed to schedule data import job", "error", err, "cron", s.config.DataImportCron)
+	} else {
+		slog.Info("Scheduled data import job", "cron", s.config.DataImportCron)
 	}
 
-	// Schedule weekly summary calculation (daily at 3 AM)
-	weeklyCron := "0 0 3 * * *"
-	_, err = s.cron.AddFunc(weeklyCron, s.calculateWeeklySummaryJob)
+	// Schedule weekly summary calculation using config
+	_, err = s.cron.AddFunc(s.config.WeeklySummaryCron, s.calculateWeeklySummaryJob)
 	if err != nil {
-		slog.Error("Failed to schedule weekly summary job", "error", err)
+		slog.Error("Failed to schedule weekly summary job", "error", err, "cron", s.config.WeeklySummaryCron)
+	} else {
+		slog.Info("Scheduled weekly summary job", "cron", s.config.WeeklySummaryCron)
 	}
 
-	// Schedule monthly summary calculation (daily at 4 AM)
-	monthlyCron := "0 0 4 * * *"
-	_, err = s.cron.AddFunc(monthlyCron, s.calculateMonthlySummaryJob)
+	// Schedule monthly summary calculation using config
+	_, err = s.cron.AddFunc(s.config.MonthlySummaryCron, s.calculateMonthlySummaryJob)
 	if err != nil {
-		slog.Error("Failed to schedule monthly summary job", "error", err)
+		slog.Error("Failed to schedule monthly summary job", "error", err, "cron", s.config.MonthlySummaryCron)
+	} else {
+		slog.Info("Scheduled monthly summary job", "cron", s.config.MonthlySummaryCron)
 	}
 
-	// Schedule yearly summary calculation (daily at 5 AM)
-	yearlyCron := "0 0 5 * * *"
-	_, err = s.cron.AddFunc(yearlyCron, s.calculateYearlySummaryJob)
+	// Schedule yearly summary calculation using config
+	_, err = s.cron.AddFunc(s.config.YearlySummaryCron, s.calculateYearlySummaryJob)
 	if err != nil {
-		slog.Error("Failed to schedule yearly summary job", "error", err)
+		slog.Error("Failed to schedule yearly summary job", "error", err, "cron", s.config.YearlySummaryCron)
+	} else {
+		slog.Info("Scheduled yearly summary job", "cron", s.config.YearlySummaryCron)
 	}
 
 	s.cron.Start()

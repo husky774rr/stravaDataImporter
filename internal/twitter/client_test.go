@@ -10,8 +10,8 @@ import (
 
 func TestNewClient(t *testing.T) {
 	cfg := &config.Config{
-		TwitterBearerToken: "test_bearer_token",
-		TwitterConsumerKey: "test_consumer_key",
+		TwitterAPIKey:    "test_bearer_token",
+		TwitterAPISecret: "test_consumer_key",
 	}
 
 	client := NewClient(cfg)
@@ -91,7 +91,7 @@ func TestTranslateActivityType(t *testing.T) {
 
 func TestPostActivity(t *testing.T) {
 	cfg := &config.Config{
-		TwitterBearerToken: "test_bearer_token",
+		TwitterAPIKey: "test_bearer_token",
 	}
 	client := NewClient(cfg)
 

@@ -10,7 +10,7 @@ func TestNewClient(t *testing.T) {
 	cfg := &config.Config{
 		StravaClientID:     "test_client_id",
 		StravaClientSecret: "test_client_secret",
-		StravaRedirectURL:  "http://localhost:8080/auth/callback",
+		StravaRedirectURL:  "http://localhost:9090/auth/callback",
 	}
 
 	client := NewClient(cfg)
@@ -27,7 +27,7 @@ func TestGetAuthURL(t *testing.T) {
 	cfg := &config.Config{
 		StravaClientID:     "test_client_id",
 		StravaClientSecret: "test_client_secret",
-		StravaRedirectURL:  "http://localhost:8080/auth/callback",
+		StravaRedirectURL:  "http://localhost:9090/auth/callback",
 	}
 
 	client := NewClient(cfg)

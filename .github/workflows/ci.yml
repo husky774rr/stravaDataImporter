@@ -57,7 +57,7 @@ jobs:
         INFLUXDB_BUCKET: test
         STRAVA_CLIENT_ID: test
         STRAVA_CLIENT_SECRET: test
-        STRAVA_REDIRECT_URI: http://localhost:8080/auth/callback
+        STRAVA_REDIRECT_URI: http://localhost:9090/auth/callback
       run: go test -v -race -coverprofile=coverage.out ./...
     
     - name: Upload coverage to Codecov

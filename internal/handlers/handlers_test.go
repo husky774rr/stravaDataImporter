@@ -14,7 +14,7 @@ func TestNewHandler(t *testing.T) {
 	cfg := &config.Config{
 		StravaClientID:     "test_client_id",
 		StravaClientSecret: "test_client_secret",
-		StravaRedirectURL:  "http://localhost:8080/auth/callback",
+		StravaRedirectURL:  "http://localhost:9090/auth/callback",
 		FTPFilePath:        "./test_ftp.csv",
 	}
 

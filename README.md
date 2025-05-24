@@ -95,7 +95,7 @@ make run-dev
 make build && make run
 ```
 
-アプリケーションは http://localhost:8080 でアクセス可能です。
+アプリケーションは http://localhost:9090 でアクセス可能です。
 
 ## 設定
 
@@ -103,11 +103,11 @@ make build && make run
 
 | 変数名 | 説明 | デフォルト |
 |--------|------|------------|
-| `PORT` | サーバーポート | `8080` |
+| `PORT` | サーバーポート | `9090` |
 | `LOG_LEVEL` | ログレベル (debug, info, warn, error) | `info` |
 | `STRAVA_CLIENT_ID` | Strava API クライアントID | - |
 | `STRAVA_CLIENT_SECRET` | Strava API クライアントシークレット | - |
-| `STRAVA_REDIRECT_URI` | OAuth リダイレクトURI | `http://localhost:8080/auth/callback` |
+| `STRAVA_REDIRECT_URI` | OAuth リダイレクトURI | `http://localhost:9090/auth/callback` |
 | `INFLUXDB_URL` | InfluxDB URL | `http://localhost:8086` |
 | `INFLUXDB_TOKEN` | InfluxDB 認証トークン | - |
 | `INFLUXDB_ORG` | InfluxDB 組織名 | `strava` |

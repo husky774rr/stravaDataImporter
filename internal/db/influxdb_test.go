@@ -10,10 +10,10 @@ import (
 
 func TestNewInfluxDBClient(t *testing.T) {
 	cfg := &config.Config{
-		InfluxURL:    "http://localhost:8086",
-		InfluxToken:  "test-token",
-		InfluxOrg:    "test-org",
-		InfluxBucket: "test-bucket",
+		InfluxDBURL:    "http://localhost:8086",
+		InfluxDBToken:  "test-token",
+		InfluxDBOrg:    "test-org",
+		InfluxDBBucket: "test-bucket",
 	}
 
 	// This test will fail if InfluxDB is not running

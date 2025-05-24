@@ -23,26 +23,30 @@ type InfluxDBClient struct {
 }
 
 func NewInfluxDBClient(cfg *config.Config) (*InfluxDBClient, error) {
-	client := influxdb2.NewClient(cfg.InfluxURL, cfg.InfluxToken)
+	slog.Info("Creating InfluxDB client", "url", cfg.InfluxDBURL, "org", cfg.InfluxDBOrg, "bucket", cfg.InfluxDBBucket, "token_length", len(cfg.InfluxDBToken))
+
+	client := influxdb2.NewClient(cfg.InfluxDBURL, cfg.InfluxDBToken)
 
 	// Test connection
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := client.Health(ctx)
+	health, err := client.Health(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to InfluxDB: %w", err)
 	}
 
-	writeAPI := client.WriteAPI(cfg.InfluxOrg, cfg.InfluxBucket)
-	queryAPI := client.QueryAPI(cfg.InfluxOrg)
+	slog.Info("InfluxDB health check passed", "status", health.Status, "message", health.Message)
+
+	writeAPI := client.WriteAPI(cfg.InfluxDBOrg, cfg.InfluxDBBucket)
+	queryAPI := client.QueryAPI(cfg.InfluxDBOrg)
 
 	return &InfluxDBClient{
 		client:   client,
 		writeAPI: writeAPI,
 		queryAPI: queryAPI,
-		bucket:   cfg.InfluxBucket,
-		org:      cfg.InfluxOrg,
+		bucket:   cfg.InfluxDBBucket,
+		org:      cfg.InfluxDBOrg,
 	}, nil
 }
 
@@ -72,6 +76,14 @@ func (c *InfluxDBClient) WriteActivity(activity *strava.ActivityData) error {
 		AddField("tss", activity.TSS).
 		AddField("np", activity.NP).
 		SetTime(activity.StartDate)
+
+	// Check for write errors
+	errorsCh := c.writeAPI.Errors()
+	go func() {
+		for err := range errorsCh {
+			slog.Error("InfluxDB write error", "error", err)
+		}
+	}()
 
 	c.writeAPI.WritePoint(p)
 	c.writeAPI.Flush()
