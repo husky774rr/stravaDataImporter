@@ -24,18 +24,26 @@ type Handler struct {
 }
 
 func NewHandler(cfg *config.Config, influxClient *db.InfluxDBClient) *Handler {
+	var tokenStore *auth.TokenStore
+	var ftpManager *ftp.FTPManager
+
+	if influxClient != nil {
+		tokenStore = auth.NewTokenStore(influxClient)
+		ftpManager = ftp.NewFTPManager(cfg.FTPFilePath)
+	}
+
 	return &Handler{
 		config:       cfg,
 		stravaClient: strava.NewClient(cfg),
-		tokenStore:   auth.NewTokenStore("./data/token.json"),
+		tokenStore:   tokenStore,
 		stateStore:   auth.NewStateStore(),
-		ftpManager:   ftp.NewFTPManager(cfg.FTPFilePath),
+		ftpManager:   ftpManager,
 		influxClient: influxClient,
 	}
 }
 
 func (h *Handler) Home(c *gin.Context) {
-	if h.tokenStore.HasValidToken() {
+	if h.tokenStore != nil && h.tokenStore.HasValidToken() {
 		c.Redirect(http.StatusFound, "/portal")
 		return
 	}
@@ -49,12 +57,21 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) Portal(c *gin.Context) {
-	if !h.tokenStore.HasValidToken() {
+	if h.tokenStore == nil || !h.tokenStore.HasValidToken() {
 		c.Redirect(http.StatusFound, "/login")
 		return
 	}
 
 	// Get latest activity
+	if h.influxClient == nil {
+		c.HTML(http.StatusOK, "portal.html", gin.H{
+			"title":   "Strava Data Importer - Portal",
+			"loading": true,
+			"message": "Please wait while we fetch your activities...",
+		})
+		return
+	}
+
 	latestActivity, err := h.influxClient.GetLatestActivity()
 	if err != nil {
 		slog.Error("Failed to get latest activity", "error", err)

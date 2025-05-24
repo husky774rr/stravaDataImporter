@@ -29,7 +29,7 @@ func New(cfg *config.Config, influxClient *db.InfluxDBClient) *Scheduler {
 		config:        cfg,
 		cron:          cron.New(cron.WithSeconds()),
 		stravaClient:  strava.NewClient(cfg),
-		tokenStore:    auth.NewTokenStore("./data/token.json"),
+		tokenStore:    auth.NewTokenStore(influxClient),
 		ftpManager:    ftp.NewFTPManager(cfg.FTPFilePath),
 		influxClient:  influxClient,
 		twitterClient: twitter.NewClient(cfg),

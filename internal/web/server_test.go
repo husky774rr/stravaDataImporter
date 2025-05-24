@@ -6,7 +6,22 @@ import (
 	"testing"
 
 	"stravaDataImporter/internal/config"
+	"stravaDataImporter/internal/strava"
 )
+
+// InfluxDBClientのインターフェイスを実装するモック
+type mockInfluxDBClient struct{}
+
+func (m *mockInfluxDBClient) Close()                                                   {}
+func (m *mockInfluxDBClient) WriteActivity(activity *strava.ActivityData) error        { return nil }
+func (m *mockInfluxDBClient) WriteWeeklySummary(summary *strava.WeeklySummary) error   { return nil }
+func (m *mockInfluxDBClient) WriteMonthlySummary(summary *strava.MonthlySummary) error { return nil }
+func (m *mockInfluxDBClient) WriteYearlySummary(summary *strava.YearlySummary) error   { return nil }
+func (m *mockInfluxDBClient) GetLatestActivity() (*strava.ActivityData, error)         { return nil, nil }
+func (m *mockInfluxDBClient) GetWeeklyTrend() ([]strava.WeeklySummary, error)          { return nil, nil }
+func (m *mockInfluxDBClient) SaveToken(token *strava.TokenData) error                  { return nil }
+func (m *mockInfluxDBClient) LoadToken() (*strava.TokenData, error)                    { return nil, nil }
+func (m *mockInfluxDBClient) ClearToken() error                                        { return nil }
 
 func TestNewServer(t *testing.T) {
 	cfg := &config.Config{

@@ -3,32 +3,30 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
 	"stravaDataImporter/internal/strava"
 )
 
-type TokenStore struct {
-	mu       sync.RWMutex
-	filePath string
-	token    *strava.TokenData
+// InfluxDBTokenStore interface for dependency injection
+type InfluxDBTokenStore interface {
+	SaveToken(token *strava.TokenData) error
+	LoadToken() (*strava.TokenData, error)
+	ClearToken() error
 }
 
-func NewTokenStore(filePath string) *TokenStore {
-	// Create directory if it doesn't exist
-	dir := filepath.Dir(filePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		slog.Error("Failed to create token directory", "error", err)
-	}
+type TokenStore struct {
+	mu          sync.RWMutex
+	influxStore InfluxDBTokenStore
+	token       *strava.TokenData
+}
 
+func NewTokenStore(influxStore InfluxDBTokenStore) *TokenStore {
 	return &TokenStore{
-		filePath: filePath,
+		influxStore: influxStore,
 	}
 }
 
@@ -36,17 +34,12 @@ func (ts *TokenStore) SaveToken(token *strava.TokenData) error {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
-	data, err := json.Marshal(token)
-	if err != nil {
-		return fmt.Errorf("failed to marshal token: %w", err)
-	}
-
-	if err := os.WriteFile(ts.filePath, data, 0600); err != nil {
-		return fmt.Errorf("failed to write token file: %w", err)
+	if err := ts.influxStore.SaveToken(token); err != nil {
+		return fmt.Errorf("failed to save token to InfluxDB: %w", err)
 	}
 
 	ts.token = token
-	slog.Info("Token saved successfully")
+	slog.Info("Token saved successfully to InfluxDB")
 	return nil
 }
 
@@ -58,21 +51,16 @@ func (ts *TokenStore) LoadToken() (*strava.TokenData, error) {
 		return ts.token, nil
 	}
 
-	data, err := os.ReadFile(ts.filePath)
+	token, err := ts.influxStore.LoadToken()
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil // No token exists
-		}
-		return nil, fmt.Errorf("failed to read token file: %w", err)
+		return nil, fmt.Errorf("failed to load token from InfluxDB: %w", err)
 	}
 
-	var token strava.TokenData
-	if err := json.Unmarshal(data, &token); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal token: %w", err)
+	if token != nil {
+		ts.token = token
 	}
 
-	ts.token = &token
-	return &token, nil
+	return token, nil
 }
 
 func (ts *TokenStore) HasValidToken() bool {
@@ -89,12 +77,12 @@ func (ts *TokenStore) ClearToken() error {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
-	if err := os.Remove(ts.filePath); err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("failed to remove token file: %w", err)
+	if err := ts.influxStore.ClearToken(); err != nil {
+		return fmt.Errorf("failed to clear token from InfluxDB: %w", err)
 	}
 
 	ts.token = nil
-	slog.Info("Token cleared successfully")
+	slog.Info("Token cleared successfully from InfluxDB")
 	return nil
 }
 

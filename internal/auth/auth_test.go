@@ -1,18 +1,34 @@
 package auth
 
 import (
-	"path/filepath"
 	"testing"
 	"time"
 
 	"stravaDataImporter/internal/strava"
 )
 
-func TestTokenStore(t *testing.T) {
-	tempDir := t.TempDir()
-	tokenFile := filepath.Join(tempDir, "token.json")
+// Mock InfluxDBTokenStore for testing
+type mockInfluxDBTokenStore struct {
+	token *strava.TokenData
+}
 
-	store := NewTokenStore(tokenFile)
+func (m *mockInfluxDBTokenStore) SaveToken(token *strava.TokenData) error {
+	m.token = token
+	return nil
+}
+
+func (m *mockInfluxDBTokenStore) LoadToken() (*strava.TokenData, error) {
+	return m.token, nil
+}
+
+func (m *mockInfluxDBTokenStore) ClearToken() error {
+	m.token = nil
+	return nil
+}
+
+func TestTokenStore(t *testing.T) {
+	mockStore := &mockInfluxDBTokenStore{}
+	store := NewTokenStore(mockStore)
 
 	// Test saving and loading token
 	token := &strava.TokenData{
@@ -20,6 +36,7 @@ func TestTokenStore(t *testing.T) {
 		RefreshToken: "test_refresh_token",
 		ExpiresAt:    time.Now().Add(1 * time.Hour),
 		TokenType:    "Bearer",
+		AthleteID:    12345,
 	}
 
 	err := store.SaveToken(token)
@@ -40,6 +57,10 @@ func TestTokenStore(t *testing.T) {
 		t.Errorf("RefreshToken = %v, want %v", loadedToken.RefreshToken, token.RefreshToken)
 	}
 
+	if loadedToken.AthleteID != token.AthleteID {
+		t.Errorf("AthleteID = %v, want %v", loadedToken.AthleteID, token.AthleteID)
+	}
+
 	// Test HasValidToken
 	if !store.HasValidToken() {
 		t.Error("HasValidToken() = false, want true")
@@ -51,6 +72,7 @@ func TestTokenStore(t *testing.T) {
 		RefreshToken: "expired_refresh",
 		ExpiresAt:    time.Now().Add(-1 * time.Hour),
 		TokenType:    "Bearer",
+		AthleteID:    67890,
 	}
 
 	err = store.SaveToken(expiredToken)
@@ -74,10 +96,8 @@ func TestTokenStore(t *testing.T) {
 }
 
 func TestTokenStoreNoFile(t *testing.T) {
-	tempDir := t.TempDir()
-	tokenFile := filepath.Join(tempDir, "nonexistent.json")
-
-	store := NewTokenStore(tokenFile)
+	mockStore := &mockInfluxDBTokenStore{}
+	store := NewTokenStore(mockStore)
 
 	token, err := store.LoadToken()
 	if err != nil {
@@ -85,11 +105,11 @@ func TestTokenStoreNoFile(t *testing.T) {
 	}
 
 	if token != nil {
-		t.Error("LoadToken() = non-nil, want nil for nonexistent file")
+		t.Error("LoadToken() = non-nil, want nil for empty store")
 	}
 
 	if store.HasValidToken() {
-		t.Error("HasValidToken() = true, want false for nonexistent token")
+		t.Error("HasValidToken() = true, want false for empty token store")
 	}
 }
 

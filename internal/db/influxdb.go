@@ -300,3 +300,103 @@ func (c *InfluxDBClient) GetWeeklyTrend() ([]strava.WeeklySummary, error) {
 
 	return summaries, nil
 }
+
+// Token management methods
+func (c *InfluxDBClient) SaveToken(token *strava.TokenData) error {
+	p := influxdb2.NewPointWithMeasurement("tokens").
+		AddTag("token_type", "strava_access").
+		AddField("access_token", token.AccessToken).
+		AddField("refresh_token", token.RefreshToken).
+		AddField("expires_at", token.ExpiresAt.Unix()).
+		AddField("athlete_id", token.AthleteID).
+		SetTime(time.Now())
+
+	// Check for write errors
+	errorsCh := c.writeAPI.Errors()
+	go func() {
+		for err := range errorsCh {
+			slog.Error("InfluxDB token write error", "error", err)
+		}
+	}()
+
+	c.writeAPI.WritePoint(p)
+	c.writeAPI.Flush()
+
+	slog.Info("Token saved to InfluxDB", "athlete_id", token.AthleteID)
+	return nil
+}
+
+func (c *InfluxDBClient) LoadToken() (*strava.TokenData, error) {
+	query := fmt.Sprintf(`
+		from(bucket: "%s")
+		|> range(start: -7d)
+		|> filter(fn: (r) => r._measurement == "tokens")
+		|> filter(fn: (r) => r.token_type == "strava_access")
+		|> sort(columns: ["_time"], desc: true)
+		|> limit(n: 1)
+		|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+	`, c.bucket)
+
+	result, err := c.queryAPI.Query(context.Background(), query)
+	if err != nil {
+		return nil, fmt.Errorf("token query failed: %w", err)
+	}
+	defer func() { _ = result.Close() }()
+
+	if !result.Next() {
+		return nil, nil // No token found
+	}
+
+	record := result.Record()
+	token := &strava.TokenData{}
+
+	// Parse access token
+	if val := record.ValueByKey("access_token"); val != nil {
+		if accessToken, ok := val.(string); ok {
+			token.AccessToken = accessToken
+		}
+	}
+
+	// Parse refresh token
+	if val := record.ValueByKey("refresh_token"); val != nil {
+		if refreshToken, ok := val.(string); ok {
+			token.RefreshToken = refreshToken
+		}
+	}
+
+	// Parse expires_at
+	if val := record.ValueByKey("expires_at"); val != nil {
+		if expiresAt, ok := val.(float64); ok {
+			token.ExpiresAt = time.Unix(int64(expiresAt), 0)
+		}
+	}
+
+	// Parse athlete_id
+	if val := record.ValueByKey("athlete_id"); val != nil {
+		if athleteID, ok := val.(float64); ok {
+			token.AthleteID = int64(athleteID)
+		}
+	}
+
+	slog.Info("Token loaded from InfluxDB", "athlete_id", token.AthleteID)
+	return token, nil
+}
+
+func (c *InfluxDBClient) ClearToken() error {
+	// InfluxDBでは過去のデータを直接削除するのは複雑なので、
+	// 代わりに無効化フラグを立てるアプローチを取ります
+	p := influxdb2.NewPointWithMeasurement("tokens").
+		AddTag("token_type", "strava_access").
+		AddField("access_token", "").
+		AddField("refresh_token", "").
+		AddField("expires_at", time.Now().Add(-24*time.Hour).Unix()). // 過去の時間に設定
+		AddField("athlete_id", int64(0)).
+		AddField("invalidated", true).
+		SetTime(time.Now())
+
+	c.writeAPI.WritePoint(p)
+	c.writeAPI.Flush()
+
+	slog.Info("Token invalidated in InfluxDB")
+	return nil
+}

@@ -78,6 +78,7 @@ func (c *Client) ExchangeCodeForToken(code string) (*TokenData, error) {
 		RefreshToken: tokenResp.RefreshToken,
 		ExpiresAt:    time.Unix(tokenResp.ExpiresAt, 0),
 		TokenType:    tokenResp.TokenType,
+		AthleteID:    tokenResp.Athlete.ID,
 	}, nil
 }
 
@@ -109,6 +110,7 @@ func (c *Client) RefreshToken(refreshToken string) (*TokenData, error) {
 		RefreshToken: tokenResp.RefreshToken,
 		ExpiresAt:    time.Unix(tokenResp.ExpiresAt, 0),
 		TokenType:    tokenResp.TokenType,
+		AthleteID:    tokenResp.Athlete.ID,
 	}, nil
 }
 

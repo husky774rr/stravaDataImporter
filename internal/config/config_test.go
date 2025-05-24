@@ -48,8 +48,8 @@ func TestLoadDefaults(t *testing.T) {
 		t.Fatalf("Load() error = %v", err)
 	}
 
-	if cfg.Port != "8080" {
-		t.Errorf("Default Port = %v, want %v", cfg.Port, "8080")
+	if cfg.Port != "9090" {
+		t.Errorf("Default Port = %v, want %v", cfg.Port, "9090")
 	}
 
 	if cfg.TokenRefreshInterval != 24*time.Hour {

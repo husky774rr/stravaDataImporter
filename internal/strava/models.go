@@ -61,6 +61,7 @@ type TokenData struct {
 	RefreshToken string    `json:"refresh_token"`
 	ExpiresAt    time.Time `json:"expires_at"`
 	TokenType    string    `json:"token_type"`
+	AthleteID    int64     `json:"athlete_id"`
 }
 
 // StravaActivity represents the raw activity data from Strava API
