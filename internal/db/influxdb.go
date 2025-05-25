@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"strconv"
@@ -87,6 +88,11 @@ func (c *InfluxDBClient) WriteActivity(activity *strava.ActivityData) error {
 
 	c.writeAPI.WritePoint(p)
 	c.writeAPI.Flush()
+
+	activityJsonStr, err := json.Marshal(activity)
+	if err == nil {
+		slog.Debug("Activity JSON marshaled", "activity_json", string(activityJsonStr))
+	}
 
 	slog.Info("Activity written to InfluxDB", "activity_id", activity.ID, "name", activity.Name)
 	return nil
@@ -337,23 +343,29 @@ func (c *InfluxDBClient) LoadToken() (*strava.TokenData, error) {
 		|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
 	`, c.bucket)
 
+	slog.Debug("Executing token query", "bucket", c.bucket)
 	result, err := c.queryAPI.Query(context.Background(), query)
 	if err != nil {
+		slog.Error("Token query failed", "error", err)
 		return nil, fmt.Errorf("token query failed: %w", err)
 	}
 	defer func() { _ = result.Close() }()
 
 	if !result.Next() {
+		slog.Debug("No token found in InfluxDB")
 		return nil, nil // No token found
 	}
 
 	record := result.Record()
 	token := &strava.TokenData{}
 
+	slog.Debug("Found token record", "time", record.Time(), "measurement", record.Measurement())
+
 	// Parse access token
 	if val := record.ValueByKey("access_token"); val != nil {
 		if accessToken, ok := val.(string); ok {
 			token.AccessToken = accessToken
+			slog.Debug("Parsed access token", "length", len(accessToken))
 		}
 	}
 
@@ -361,6 +373,7 @@ func (c *InfluxDBClient) LoadToken() (*strava.TokenData, error) {
 	if val := record.ValueByKey("refresh_token"); val != nil {
 		if refreshToken, ok := val.(string); ok {
 			token.RefreshToken = refreshToken
+			slog.Debug("Parsed refresh token", "length", len(refreshToken))
 		}
 	}
 
@@ -368,6 +381,7 @@ func (c *InfluxDBClient) LoadToken() (*strava.TokenData, error) {
 	if val := record.ValueByKey("expires_at"); val != nil {
 		if expiresAt, ok := val.(float64); ok {
 			token.ExpiresAt = time.Unix(int64(expiresAt), 0)
+			slog.Debug("Parsed expires_at", "expires_at", token.ExpiresAt)
 		}
 	}
 
@@ -375,6 +389,7 @@ func (c *InfluxDBClient) LoadToken() (*strava.TokenData, error) {
 	if val := record.ValueByKey("athlete_id"); val != nil {
 		if athleteID, ok := val.(float64); ok {
 			token.AthleteID = int64(athleteID)
+			slog.Debug("Parsed athlete_id", "athlete_id", token.AthleteID)
 		}
 	}
 

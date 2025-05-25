@@ -44,20 +44,38 @@ func (ts *TokenStore) SaveToken(token *strava.TokenData) error {
 }
 
 func (ts *TokenStore) LoadToken() (*strava.TokenData, error) {
+	// 最初に読み取りロックでメモリキャッシュをチェック
 	ts.mu.RLock()
-	defer ts.mu.RUnlock()
-
 	if ts.token != nil {
+		cachedToken := ts.token
+		ts.mu.RUnlock()
+		slog.Debug("Token loaded from memory cache", "athlete_id", cachedToken.AthleteID)
+		return cachedToken, nil
+	}
+	ts.mu.RUnlock()
+
+	// メモリキャッシュにない場合は書き込みロックでInfluxDBから読み込み
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+
+	// ダブルチェック（他のgoroutineが既に読み込んでいる可能性）
+	if ts.token != nil {
+		slog.Debug("Token loaded from memory cache (double check)", "athlete_id", ts.token.AthleteID)
 		return ts.token, nil
 	}
 
+	slog.Debug("Loading token from InfluxDB")
 	token, err := ts.influxStore.LoadToken()
 	if err != nil {
+		slog.Error("Failed to load token from InfluxDB", "error", err)
 		return nil, fmt.Errorf("failed to load token from InfluxDB: %w", err)
 	}
 
 	if token != nil {
 		ts.token = token
+		slog.Debug("Token loaded from InfluxDB and cached", "athlete_id", token.AthleteID)
+	} else {
+		slog.Debug("No token found in InfluxDB")
 	}
 
 	return token, nil
@@ -65,12 +83,19 @@ func (ts *TokenStore) LoadToken() (*strava.TokenData, error) {
 
 func (ts *TokenStore) HasValidToken() bool {
 	token, err := ts.LoadToken()
-	if err != nil || token == nil {
+	if err != nil {
+		slog.Debug("Failed to load token", "error", err)
+		return false
+	}
+	if token == nil {
+		slog.Debug("No token found")
 		return false
 	}
 
 	// Check if token is expired (with 5 minute buffer)
-	return time.Now().Add(5 * time.Minute).Before(token.ExpiresAt)
+	isValid := time.Now().Add(5 * time.Minute).Before(token.ExpiresAt)
+	slog.Debug("Token validity check", "expires_at", token.ExpiresAt, "is_valid", isValid, "athlete_id", token.AthleteID)
+	return isValid
 }
 
 func (ts *TokenStore) ClearToken() error {

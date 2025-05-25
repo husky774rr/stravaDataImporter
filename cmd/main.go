@@ -15,23 +15,28 @@ import (
 
 var log *slog.Logger
 
-func init() {
-	log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	}))
-	slog.SetDefault(log)
-}
-
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Load configuration
+	// Load configuration first
 	cfg, err := config.Load()
 	if err != nil {
-		log.Error("Failed to load configuration", "error", err)
+		// Use temporary logger for config load error
+		tempLog := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		}))
+		tempLog.Error("Failed to load configuration", "error", err)
 		os.Exit(1)
 	}
+
+	// Initialize logger with configured log level
+	log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: cfg.ParseLogLevel(),
+	}))
+	slog.SetDefault(log)
+
+	log.Info("Starting stravaDataImporter", "logLevel", cfg.LogLevel)
 
 	// Initialize InfluxDB client
 	influxClient, err := db.NewInfluxDBClient(cfg)

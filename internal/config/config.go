@@ -2,8 +2,10 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -11,7 +13,8 @@ import (
 
 type Config struct {
 	// Server configuration
-	Port string
+	Port     string
+	LogLevel string
 
 	// Strava OAuth configuration
 	StravaClientID     string
@@ -51,6 +54,7 @@ func Load() (*Config, error) {
 
 	cfg := &Config{
 		Port:                     getEnv("PORT", "9090"),
+		LogLevel:                 getEnv("LOG_LEVEL", "info"),
 		StravaClientID:           getEnv("STRAVA_CLIENT_ID", ""),
 		StravaClientSecret:       getEnv("STRAVA_CLIENT_SECRET", ""),
 		StravaRedirectURL:        getEnv("STRAVA_REDIRECT_URL", "http://localhost:9090/auth/callback"),
@@ -93,4 +97,20 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// ParseLogLevel converts a log level string to slog.Level
+func (c *Config) ParseLogLevel() slog.Level {
+	switch strings.ToLower(c.LogLevel) {
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn", "warning":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo // デフォルトはInfo
+	}
 }

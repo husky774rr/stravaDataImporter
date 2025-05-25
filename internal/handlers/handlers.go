@@ -43,10 +43,13 @@ func NewHandler(cfg *config.Config, influxClient *db.InfluxDBClient) *Handler {
 }
 
 func (h *Handler) Home(c *gin.Context) {
+	slog.Info("Home endpoint called")
 	if h.tokenStore != nil && h.tokenStore.HasValidToken() {
+		slog.Info("Valid token found, redirecting to portal")
 		c.Redirect(http.StatusFound, "/portal")
 		return
 	}
+	slog.Info("No valid token found, redirecting to login")
 	c.Redirect(http.StatusFound, "/login")
 }
 
@@ -57,13 +60,24 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) Portal(c *gin.Context) {
-	if h.tokenStore == nil || !h.tokenStore.HasValidToken() {
+	slog.Info("Portal endpoint called")
+	if h.tokenStore == nil {
+		slog.Error("TokenStore is nil, redirecting to login")
 		c.Redirect(http.StatusFound, "/login")
 		return
 	}
+	
+	if !h.tokenStore.HasValidToken() {
+		slog.Error("No valid token found, redirecting to login")
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+	
+	slog.Info("Valid token found, proceeding to portal")
 
 	// Get latest activity
 	if h.influxClient == nil {
+		slog.Warn("InfluxDB client is nil, showing loading page")
 		c.HTML(http.StatusOK, "portal.html", gin.H{
 			"title":   "Strava Data Importer - Portal",
 			"loading": true,
@@ -141,10 +155,21 @@ func (h *Handler) AuthCallback(c *gin.Context) {
 		return
 	}
 
+	slog.Info("Token exchange successful", "athlete_id", token.AthleteID, "expires_at", token.ExpiresAt)
+
 	if err := h.tokenStore.SaveToken(token); err != nil {
 		slog.Error("Failed to save token", "error", err)
 		c.Redirect(http.StatusFound, "/login?error=token_save_failed")
 		return
+	}
+
+	slog.Info("Token saved successfully, checking validity")
+	
+	// Verify token was saved correctly
+	if h.tokenStore.HasValidToken() {
+		slog.Info("Token validation successful after save")
+	} else {
+		slog.Error("Token validation failed immediately after save")
 	}
 
 	// Load FTP data
