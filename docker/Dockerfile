@@ -32,6 +32,9 @@ COPY --from=builder /app/conf ./conf
 # Copy web templates
 COPY --from=builder /app/internal/web/templates ./templates
 
+# Copy static assets (fonts, etc.)
+COPY --from=builder /app/static ./static
+
 # Create a non-root user
 RUN adduser -D -s /bin/sh appuser
 USER appuser
